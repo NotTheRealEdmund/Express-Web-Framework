@@ -9,4 +9,8 @@ app.get('/example', (req,res) => {
     res.send('Hitting example route');
 });
 
+app.get('/example/:name/:age', (req,res) => {     
+    res.send(req.params.name + " : " + req.params.age);
+});
+
 app.listen(3000);
