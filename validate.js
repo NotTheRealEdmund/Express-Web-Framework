@@ -1,46 +1,33 @@
-const express = require('express');
-const path = require('path');    
-const app = express();
-// Module to validate the user input in app.post
-const Joi = require('joi'); 
+const Joi = require('joi');
+const arrayString = ['banana', 'bacon', 'cheese'];
+const arrayObjects = [{example: 'example1'}, {example: 'example2'}, {example: 'example3'}];
+const userInput = { personalInfo: {
+                        streetAddress : '123456789',
+                        city : 'webville',
+                        state : 'fl'
+                    },
+                    preferences : arrayString};
 
-app.use('/public', express.static(path.join(__dirname, 'static')));  
+// Break down user input into sections, for example, 
+// develop a schema for personal info then develop another schema for preferences
+const personalInfoSchema = Joi.object().keys({
+    streetAddress : Joi.string().trim().required(),
+    city : Joi.string().trim().required(),
+    state : Joi.string().trim().length(2).required()
+});
+const preferencesSchema = Joi.array().items(Joi.string());     
 
-app.get('/', (req,res) => {
-    res.sendFile(path.join(__dirname, 'static', 'index.html'));                                                            
-});  
-
-const bodyParser = require('body-parser'); 
-
-app.use(bodyParser.urlencoded({extended: true}));
-
-app.use(bodyParser.json());              
-
-// Makes sure the email/password the user gives us is valid by enforcing a set of rules for the inputs
-app.post('/', (req,res) => {
-    console.log(req.body);
-
-    // Create a schema, a set of rules that the data we're receiving must follow    
-    const schema = Joi.object().keys({
-        // This states that the email field must be a string value, trim method is always used, email() method
-        // checks if it's a valid email, required() method will give an error if the user does not fill in anything
-        email: Joi.string().trim().email().required(),
-
-        // This states that there must be a minimum of 5 characters and maximum 10 characters, string and required
-        password: Joi.string().min(5).max(10).required(),
-    });   
-
-    // Take action depending on whether the input is valid or not
-    Joi.validate(req.body, schema, (err,result) => {         
-        console.log(result);
-        if (err) {
-            console.log(err);
-            res.json({success : false});
-        } else {
-            res.json({success : true});
-        }
-    });
-
+// Now combine both the schemas into one
+const schema = Joi.object().keys({              
+    personalInfo : personalInfoSchema,
+    preferences : preferencesSchema
 });
 
-app.listen(3000);
+Joi.validate(userInput, schema, (err,result) => {   
+    if (err) {
+        console.log(err);
+    } else {
+        console.log(result);
+    }
+});
+//Now try it out again, it should work as expected for both valid and invalid data.
