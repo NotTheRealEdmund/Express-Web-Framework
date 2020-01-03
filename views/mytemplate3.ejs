@@ -1,0 +1,9 @@
+<ul>
+    <% for (var person of people) { %>
+        <% if (person.age > 18) { %>
+            <li>This person, <%= person.name %>, of age <%= person.age %>, is legal to drive.</li>
+        <% } else { %>
+            <li>This person, <%= person.name %>, of age <%= person.age %>, is NOT legal to drive.</li>
+        <% } %>
+    <% } %>
+</ul>
